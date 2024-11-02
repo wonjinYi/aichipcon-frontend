@@ -157,7 +157,7 @@ function PolygonEditor() {
 
   useEffect(() => {
     drawPolygon();
-  }, [coordinates, hoveringPointIndex]);
+  }, [coordinates, hoveringPointIndex, drawPolygon]);
 
   return (
     <div
