@@ -1,0 +1,4 @@
+**/__pycache__/
+server/cache/
+server/videos/
+.DS_Store

@@ -1,25 +1,56 @@
 import React, { useState } from 'react';
 import { Pie } from 'react-chartjs-2';
-import Chart from 'chart.js/auto';
 import Slider from '@mui/material/Slider';
+import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import axios from 'axios';
 import './App.css';
 
+
+import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
+
+// Register the components
+Chart.register(ArcElement, Tooltip, Legend);
+
 function App() {
+  const [videoFile, setVideoFile] = useState(null);
   const [frameData, setFrameData] = useState(null);
   const [chartData, setChartData] = useState(null);
   const [currentFrame, setCurrentFrame] = useState(0);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const result = event.target.result;
-      const parsedData = JSON.parse(result);
-      setFrameData(parsedData);
-      generateChartData(parsedData, 0); // Start with the first frame
-    };
-    reader.readAsText(file);
+    setVideoFile(file);
+  };
+
+  const handleProcessVideo = async () => {
+    if (!videoFile) {
+      alert("Please upload a video file first.");
+      return;
+    }
+    setIsProcessing(true);
+    const formData = new FormData();
+    formData.append('video', videoFile);
+
+    try {
+      // Assume backend URL is '/api/process-video'
+      const response = await axios.post('http://localhost:8080/detect', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (response.data) {
+        setFrameData(response.data);
+        generateChartData(response.data, 0);
+      }
+    } catch (error) {
+      console.error("Error processing video:", error);
+      alert("Failed to process video. Please try again.");
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const generateChartData = (frames, frameIndex) => {
@@ -27,8 +58,10 @@ function App() {
 
     const objectCounts = {};
 
+    // {"class": c, "confidence": co, "coordinates": xy}
+    console.log("Frame data:", frames[frameIndex]);
     frames[frameIndex].forEach((obj) => {
-      const classId = obj.class_id;
+      const classId = obj.class;
       if (objectCounts[classId]) {
         objectCounts[classId] += 1;
       } else {
@@ -36,8 +69,10 @@ function App() {
       }
     });
 
+    console.log("Object counts:", objectCounts);
     const labels = Object.keys(objectCounts).map((classId) => `Class ${classId}`);
     const data = Object.values(objectCounts);
+    console.log(data);
 
     const chartData = {
       labels: labels,
@@ -45,56 +80,32 @@ function App() {
         {
           label: 'Object Count per Class',
           data: data,
-          backgroundColor: [
-            'rgba(255, 99, 132, 0.2)',
-            'rgba(54, 162, 235, 0.2)',
-            'rgba(255, 206, 86, 0.2)',
-            'rgba(75, 192, 192, 0.2)',
-            'rgba(153, 102, 255, 0.2)',
-            'rgba(255, 159, 64, 0.2)',
-          ],
-          borderColor: [
-            'rgba(255, 99, 132, 1)',
-            'rgba(54, 162, 235, 1)',
-            'rgba(255, 206, 86, 1)',
-            'rgba(75, 192, 192, 1)',
-            'rgba(153, 102, 255, 1)',
-            'rgba(255, 159, 64, 1)',
-          ],
           borderWidth: 1,
         },
       ],
     };
-
     setChartData(chartData);
   };
 
-  const handleNextFrame = () => {
-    if (frameData && currentFrame < frameData.length - 1) {
-      const nextFrame = currentFrame + 1;
-      setCurrentFrame(nextFrame);
-      generateChartData(frameData, nextFrame);
-    }
-  };
-
-  const handlePreviousFrame = () => {
-    if (frameData && currentFrame > 0) {
-      const prevFrame = currentFrame - 1;
-      setCurrentFrame(prevFrame);
-      generateChartData(frameData, prevFrame);
-    }
-  };
   const handleSliderChange = (event, newValue) => {
+    console.log("Slider value:", newValue);
     setCurrentFrame(newValue);
     generateChartData(frameData, newValue);
   };
-
 
   return (
     <div className="App">
       <header className="App-header">
         <h1>Object Detection Visualization</h1>
         <input type="file" onChange={handleFileUpload} />
+        <Button 
+          variant="contained" 
+          color="primary" 
+          onClick={handleProcessVideo} 
+          disabled={isProcessing}
+        >
+          {isProcessing ? "Processing..." : "Start Processing"}
+        </Button>
         {chartData && (
           <div className="chart-container">
             <h2>Frame {currentFrame + 1} Object Count</h2>
@@ -114,18 +125,6 @@ function App() {
                 valueLabelDisplay="on"
               />
             </div>
-
-            {/* <div className="navigation-controls">
-              <button onClick={handlePreviousFrame} disabled={currentFrame === 0}>
-                Previous Frame
-              </button>
-              <button
-                onClick={handleNextFrame}
-                disabled={frameData && currentFrame === frameData.length - 1}
-              >
-                Next Frame
-              </button>
-            </div> */}
           </div>
         )}
       </header>
