@@ -100,9 +100,18 @@ async def upload_video(video: UploadFile = File):
                 tmp.append({"cls": cls, "conf": conf, "xywh": xywh})
             ret.append(tmp)
         json.dump(ret, cache_path.open("w"))
-    json.dump(ret, cache_path.open("w"))
-    return JSONResponse(content=ret)
 
+    fps = get_fps(str(video_path))
+    response_content = {"fps": fps, "data": ret}
+    json.dump(response_content, cache_path.open("w"))
+
+    return JSONResponse(content=response_content)
+
+def get_fps(video_path):
+    cap = cv2.VideoCapture(video_path)
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    cap.release()
+    return fps
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8080)
