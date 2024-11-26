@@ -88,7 +88,7 @@ function App() {
     // {"class": c, "confidence": co, "coordinates": xy}
     console.log("Frame data:", frames[frameIndex]);
     frames[frameIndex].forEach((obj) => {
-      const classId = obj.class;
+      const classId = obj.cls;
       if (objectCounts[classId]) {
         objectCounts[classId] += 1;
       } else {
@@ -226,9 +226,8 @@ function App() {
                 valueLabelDisplay="on"
               />
             </Grid2>
-            {/* left side */}
+            {/* left side: 시각화 */}
             <Grid2 item xs={10}>
-              {/* <canvas id="myChart" width="400" height="400"></canvas> */}
               {/* pie chart */}
               <Pie data={chartData} />
               {/* bar chart */}
