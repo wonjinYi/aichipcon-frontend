@@ -1,4 +1,5 @@
 **/__pycache__/
 server/cache/
 server/videos/
+server/yolov5su.pt
 .DS_Store
