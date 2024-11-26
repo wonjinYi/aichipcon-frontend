@@ -17,19 +17,22 @@
     gap:1rem;
     flex-direction : column;
 
-    width : 20%;
+    width : 30%;
     height : 100%;
    
 }
 
 .app .left-container .left-top-container {
-    background-color : green;
+    /* background-color : green; */
+    border: 1px solid black;
+    
 
-    height : 30%;
+    height : 50%;
 }
 
 .app .left-container .left-bottom-container {
     background-color : blue;
+    margin-top : 12px;
     flex: 1;
 }
 

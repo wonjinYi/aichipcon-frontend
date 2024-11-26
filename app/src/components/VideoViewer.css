@@ -1,0 +1,64 @@
+.video-viewer {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .video-viewer .video-wrap {
+    position : relative;
+    display : flex;
+    justify-content : center;
+    align-items : center;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .video-viewer .video-wrap video {
+    object-fit: contain;
+    max-width: 100%;
+    max-height: 100%;
+  }
+
+  .video-viewer .video-wrap canvas {
+    position : absolute;
+  }
+  
+  .video-viewer .controls {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    flex-direction: row; /* 슬라이더를 일직선으로 배치 */
+    gap: 10px;
+    width: 100%;
+    transform: translateY(100%);
+  }
+  
+  .range-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 5px; /* 슬라이더 높이 수정 */
+    background: #ddd;
+    border-radius: 5px;
+    outline: none;
+    cursor: pointer;
+    flex: 1; /* 동일한 너비로 배치 */
+  }
+  
+  .range-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #007bff;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  .range-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: #007bff;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  

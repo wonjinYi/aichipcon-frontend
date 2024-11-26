@@ -1,0 +1,82 @@
+import React, { useState, useEffect } from "react";
+import "./RangeSelector.css";
+
+import { useSelector, useDispatch } from "react-redux";
+import {
+  setStartFrame,
+  setEndFrame,
+  setCurrentFrame,
+} from "../stores/frameConfigSlice";
+
+function RangeSelector({ min, max }) {
+  const dispatch = useDispatch();
+
+  const frameConfig = useSelector((state) => state.frameConfig);
+  //   dispatch(setEndFrame(max));
+
+  useEffect(() => {
+    dispatch(setEndFrame(max));
+  }, []);
+
+  const handleChange = (targetName, _value) => {
+    const value = parseInt(_value);
+    if (targetName === "start") {
+      dispatch(setStartFrame(value));
+    } else if (targetName === "end") {
+      dispatch(setEndFrame(value));
+    } else if (targetName === "current") {
+      dispatch(setCurrentFrame(value));
+    }
+  };
+
+  return (
+    <div className="range-slider-container">
+      <div className="range-slider-track">
+        <div
+          className="range-slider-fill"
+          style={{
+            left: `${((frameConfig.startFrame - min) / (max - min)) * 100}%`,
+            width: `${
+              ((frameConfig.endFrame - frameConfig.startFrame) / (max - min)) *
+              100
+            }%`,
+          }}
+        ></div>
+        <input
+          type="range"
+          className="range-slider start-frame"
+          min={min}
+          max={max}
+          step={1}
+          value={frameConfig.startFrame}
+          onChange={(e) => handleChange("start", e.target.value)}
+        />
+        <input
+          type="range"
+          className="range-slider current-frame"
+          min={min}
+          max={max}
+          step={1}
+          value={frameConfig.currentFrame}
+          onChange={(e) => handleChange("current", e.target.value)}
+        />
+        <input
+          type="range"
+          className="range-slider end-frame"
+          min={min}
+          max={max}
+          step={1}
+          value={frameConfig.endFrame}
+          onChange={(e) => handleChange("end", e.target.value)}
+        />
+      </div>
+      <div className="range-values">
+        <span>Start: {frameConfig.startFrame}</span>
+        <span>Current: {frameConfig.currentFrame}</span>
+        <span>End: {frameConfig.endFrame}</span>
+      </div>
+    </div>
+  );
+}
+
+export default RangeSelector;
