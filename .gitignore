@@ -1,5 +1,11 @@
 **/__pycache__/
+<<<<<<< HEAD
 server/cache/
 server/videos/
 server/yolov5su.pt
+=======
+**/cache/
+**/videos/
+>>>>>>> f257de0472303be309c6b969b839f60f1f13a0ec
 .DS_Store
+**/*.pt
