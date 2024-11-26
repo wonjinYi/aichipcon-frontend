@@ -29,8 +29,13 @@ async def run_video(video_path: str, model: YOLO):
     cap = cv2.VideoCapture(video_path)
     res = []
 
+    frame_i = 0
     # Loop through the video frames
     while cap.isOpened():
+        # frame skipping
+        frame_i += 1
+        if frame_i % 3 != 0:
+            continue
         # Read a frame from the video
         success, frame = cap.read()
 
@@ -84,20 +89,17 @@ async def upload_video(video: UploadFile = File):
 
     # loop through video and detect objects
     ret = []
-    async for detected_result in run_video(str(video_path), yolo):
-        for result in detected_result:
-            tmp = []
-            for box in result:
-                cls = box.boxes.cls.tolist()
-                conf = box.boxes.conf.tolist()
-                xyxy = box.boxes.xyxy.tolist()
-                boxes_organized = [
-                    {"class": c, "confidence": co, "coordinates": xy}
-                    for c, co, xy in zip(cls, conf, xyxy)
-                ]
-                tmp.extend(boxes_organized)
-            ret.append(tmp)
     cache_path.parent.mkdir(parents=True, exist_ok=True)
+    async for detected_results in run_video(str(video_path), yolo):
+        for result in detected_results:
+            tmp = []
+            for box in result.boxes:
+                cls = int(box.cls.tolist()[0])
+                conf = box.conf.tolist()[0]
+                xywh = box.xywhn.tolist()[0]
+                tmp.append({"cls": cls, "conf": conf, "xywh": xywh})
+            ret.append(tmp)
+        json.dump(ret, cache_path.open("w"))
     json.dump(ret, cache_path.open("w"))
     return JSONResponse(content=ret)
 
