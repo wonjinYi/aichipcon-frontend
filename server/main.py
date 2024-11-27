@@ -23,11 +23,12 @@ app.add_middleware(
 def get_runtime():
     try:
         from dx_engine import InferenceEngine  # custom onnx runtime
+        raise ImportError
         from .scripts.npu_ver import NPURuntime
         return NPURuntime()
     except ImportError:
         from .scripts.cpu_ver import CPURuntime
-        return CPURuntime(onnx_model_path=onnx_model_path)
+        return CPURuntime()
 
 
 def run_video(video_path: str):
@@ -46,11 +47,9 @@ def run_video(video_path: str):
         success, frame = cap.read()
 
         if success:
-            # Run YOLO inference on the frame
-            # results = model(frame)
-            logging.info(frame)
+            #logging.info(frame)
             results = my_runtime.run_frame(frame)
-            logging.info(len(results))
+            #logging.info(len(results))
             res.append(results)
 
             # # Visualize the results on the frame
@@ -96,9 +95,9 @@ def upload_video(video: UploadFile = File):
     ret = []
     cache_path.parent.mkdir(parents=True, exist_ok=True)
     for detected_results in run_video(str(video_path)):
-        print(">>>>>>>>>> detected boxes", detected_results)
+        #print(">>>>>>>>>> detected boxes", detected_results)
         ret.append(detected_results)
-        json.dump(ret, cache_path.open("w"))
+    json.dump(ret, cache_path.open("w"))
 
     fps = get_fps(str(video_path))
     response_content = {"fps": fps, "data": ret}

@@ -3,8 +3,9 @@ import numpy as np
 import onnxruntime
 import torch
 import torchvision
+from pathlib import Path
 
-
+# yolo export model=yolov5su.pt format=onnx
 class CPURuntime:
     def __init__(self, onnx_model_path="yolov5su.onnx"):
         # Set YOLO input size
@@ -14,6 +15,7 @@ class CPURuntime:
         self.iou_thres = 0.6
 
         # Load the ONNX model
+        onnx_model_path = Path(__file__).parent/onnx_model_path
         print("Loading ONNX model:", onnx_model_path)
         self.session = onnxruntime.InferenceSession(onnx_model_path)
 
@@ -75,11 +77,14 @@ class CPURuntime:
         result = []
         for box, score, label in zip(boxes, scores, labels):
             # print(box, score, label)
+            box /= 640
             d = dict(
                 zip(
-                    ["x1", "y1", "x2", "y2", "conf", "class_id"],
-                    box.tolist() + [int(score), int(label)],
+                    # ["x1", "y1", "x2", "y2", "conf", "class_id"],
+                    # box.tolist() + [int(score), int(label)],
+                    ["cls", "conf", "xywh"], [int(label), float(score), list(map(float,box.tolist()))]
                 )
             )
+            print(d)
             result.append(d)
         return result
