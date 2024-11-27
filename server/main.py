@@ -23,7 +23,6 @@ app.add_middleware(
 def get_runtime():
     try:
         from dx_engine import InferenceEngine  # custom onnx runtime
-        raise ImportError
         from .scripts.npu_ver import NPURuntime
         return NPURuntime()
     except ImportError:
