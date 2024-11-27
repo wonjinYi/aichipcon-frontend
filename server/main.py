@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 import cv2
 import json
-
+import logging
 
 app = FastAPI()
 
@@ -20,18 +20,19 @@ app.add_middleware(
 )
 
 
-my_runtime = None
-try:
-    from dx_engine import InferenceEngine  # custom onnx runtime
-    from .scripts.npu_ver import NPURuntime
-    my_runtime = NPURuntime()
-except ImportError:
-    from .scripts.cpu_ver import CPURuntime
-    my_runtime = CPURuntime(onnx_model_path=onnx_model_path)
+def get_runtime():
+    try:
+        from dx_engine import InferenceEngine  # custom onnx runtime
+        from .scripts.npu_ver import NPURuntime
+        return NPURuntime()
+    except ImportError:
+        from .scripts.cpu_ver import CPURuntime
+        return CPURuntime(onnx_model_path=onnx_model_path)
 
 
-async def run_video(video_path: str):
+def run_video(video_path: str):
     cap = cv2.VideoCapture(video_path)
+    my_runtime = get_runtime()
     res = []
 
     frame_i = 0
@@ -47,9 +48,10 @@ async def run_video(video_path: str):
         if success:
             # Run YOLO inference on the frame
             # results = model(frame)
+            logging.info(frame)
             results = my_runtime.run_frame(frame)
-            # res.append(results)
-            yield results
+            logging.info(len(results))
+            res.append(results)
 
             # # Visualize the results on the frame
             # annotated_frame = results[0].plot()
@@ -65,11 +67,10 @@ async def run_video(video_path: str):
     # Release the video capture object and close the display window
     cap.release()
     cv2.destroyAllWindows()
-    # yield res
-
+    return res
 
 @app.post("/detect")
-async def upload_video(video: UploadFile = File):
+def upload_video(video: UploadFile = File):
     """
     Upload a video file, save it at specified directory, and return the detected classes and counts.
     """
@@ -85,6 +86,7 @@ async def upload_video(video: UploadFile = File):
     print(video_path)
     if not video_path.exists():
         video_path.parent.mkdir(parents=True, exist_ok=True)
+        print("write start: ", video_path)
         with open(video_path, "wb") as buffer:
             buffer.write(video.file.read())
         print("write done: ", video_path)
@@ -93,17 +95,9 @@ async def upload_video(video: UploadFile = File):
     # loop through video and detect objects
     ret = []
     cache_path.parent.mkdir(parents=True, exist_ok=True)
-    async for detected_results in run_video(str(video_path)):
+    for detected_results in run_video(str(video_path)):
         print(">>>>>>>>>> detected boxes", detected_results)
         ret.append(detected_results)
-        # for result in detected_results:
-        #     tmp = []
-        #     for box in result.boxes:
-        #         cls = int(box.cls.tolist()[0])
-        #         conf = box.conf.tolist()[0]
-        #         xywh = box.xywhn.tolist()[0]
-        #         tmp.append({"cls": cls, "conf": conf, "xywh": xywh})
-        #     ret.append(tmp)
         json.dump(ret, cache_path.open("w"))
 
     fps = get_fps(str(video_path))
@@ -117,6 +111,3 @@ def get_fps(video_path):
     fps = cap.get(cv2.CAP_PROP_FPS)
     cap.release()
     return fps
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8080)
