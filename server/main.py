@@ -11,21 +11,26 @@ import json
 
 app = FastAPI()
 
-origins = [
-    "http://localhost:3000",
-    "http://localhost:8080",
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
-async def run_video(video_path: str, model: YOLO):
+my_runtime = None
+try:
+    from dx_engine import InferenceEngine  # custom onnx runtime
+    from .scripts.npu_ver import NPURuntime
+    my_runtime = NPURuntime()
+except ImportError:
+    from .scripts.cpu_ver import CPURuntime
+    my_runtime = CPURuntime(onnx_model_path=onnx_model_path)
+
+
+async def run_video(video_path: str):
     cap = cv2.VideoCapture(video_path)
     res = []
 
@@ -41,7 +46,8 @@ async def run_video(video_path: str, model: YOLO):
 
         if success:
             # Run YOLO inference on the frame
-            results = model(frame)
+            # results = model(frame)
+            results = my_runtime.run_frame(frame)
             # res.append(results)
             yield results
 
@@ -84,21 +90,20 @@ async def upload_video(video: UploadFile = File):
         print("write done: ", video_path)
     print("loaded: ", video_path)
 
-    # Load the YOLO model
-    yolo = YOLO("yolov5s.pt")
-
     # loop through video and detect objects
     ret = []
     cache_path.parent.mkdir(parents=True, exist_ok=True)
-    async for detected_results in run_video(str(video_path), yolo):
-        for result in detected_results:
-            tmp = []
-            for box in result.boxes:
-                cls = int(box.cls.tolist()[0])
-                conf = box.conf.tolist()[0]
-                xywh = box.xywhn.tolist()[0]
-                tmp.append({"cls": cls, "conf": conf, "xywh": xywh})
-            ret.append(tmp)
+    async for detected_results in run_video(str(video_path)):
+        print(">>>>>>>>>> detected boxes", detected_results)
+        ret.append(detected_results)
+        # for result in detected_results:
+        #     tmp = []
+        #     for box in result.boxes:
+        #         cls = int(box.cls.tolist()[0])
+        #         conf = box.conf.tolist()[0]
+        #         xywh = box.xywhn.tolist()[0]
+        #         tmp.append({"cls": cls, "conf": conf, "xywh": xywh})
+        #     ret.append(tmp)
         json.dump(ret, cache_path.open("w"))
 
     fps = get_fps(str(video_path))
