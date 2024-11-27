@@ -28,37 +28,16 @@
     bottom: 0;
     left: 0;
     display: flex;
-    flex-direction: row; /* 슬라이더를 일직선으로 배치 */
+    flex-direction: row;
     gap: 10px;
     width: 100%;
-    transform: translateY(100%);
+    padding-top: 18px;
+    padding-bottom : 10px;
+    border-radius : 8px;
+    filter: opacity(0.2);
+    transition : all 0.5s;
   }
-  
-  .range-slider {
-    -webkit-appearance: none;
-    appearance: none;
-    height: 5px; /* 슬라이더 높이 수정 */
-    background: #ddd;
-    border-radius: 5px;
-    outline: none;
-    cursor: pointer;
-    flex: 1; /* 동일한 너비로 배치 */
+  .video-viewer .controls:hover {
+    filter: opacity(1);
+    background-color : white;
   }
-  
-  .range-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 20px;
-    height: 20px;
-    background: #007bff;
-    border-radius: 50%;
-    cursor: pointer;
-  }
-  
-  .range-slider::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
-    background: #007bff;
-    border-radius: 50%;
-    cursor: pointer;
-  }
-  
