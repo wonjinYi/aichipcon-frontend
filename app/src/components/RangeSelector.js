@@ -10,9 +10,7 @@ import {
 
 function RangeSelector({ min, max }) {
   const dispatch = useDispatch();
-
   const frameConfig = useSelector((state) => state.frameConfig);
-  //   dispatch(setEndFrame(max));
 
   useEffect(() => {
     dispatch(setEndFrame(max));
@@ -20,9 +18,9 @@ function RangeSelector({ min, max }) {
 
   const handleChange = (targetName, _value) => {
     const value = parseInt(_value);
-    if (targetName === "start") {
+    if (targetName === "start" && value <= frameConfig.endFrame) {
       dispatch(setStartFrame(value));
-    } else if (targetName === "end") {
+    } else if (targetName === "end" && value >= frameConfig.startFrame) {
       dispatch(setEndFrame(value));
     } else if (targetName === "current") {
       dispatch(setCurrentFrame(value));
