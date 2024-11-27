@@ -35,9 +35,12 @@ function RangeSelector({ min, max }) {
         <div
           className="range-slider-fill"
           style={{
-            left: `${((frameConfig.startFrame - min) / (max - min)) * 100}%`,
+            left: `${
+              ((frameConfig.startFrame - min - 12) / (max - min)) * 100
+            }%`,
             width: `${
-              ((frameConfig.endFrame - frameConfig.startFrame) / (max - min)) *
+              ((frameConfig.endFrame - frameConfig.startFrame + 24) /
+                (max - min)) *
               100
             }%`,
           }}
