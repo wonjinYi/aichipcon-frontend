@@ -3,8 +3,6 @@ import { Routes, Route } from "react-router-dom";
 import { useSelector } from "react-redux";
 import "./App.css";
 
-import generateChartData from "./scripts/generateChartData.js";
-
 import VideoSelector from "./components/VideoSelector";
 import VideoViewer from "./components/VideoViewer";
 import RoiList from "./components/RoiList";
@@ -19,10 +17,6 @@ function App() {
   const frameConfig = useSelector((state) => state.frameConfig);
 
   const [videoFile, setVideoFile] = useState(null);
-
-  useEffect(() => {
-    console.log("Frame data:", frameData);
-  }, [frameData]);
 
   return (
     <div className="app">
@@ -41,10 +35,14 @@ function App() {
 
       {/* right container */}
       <div className="right-container">
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/edit" element={<RoiEditor />} />
-        </Routes>
+        {frameData.length ? (
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/edit" element={<RoiEditor />} />
+          </Routes>
+        ) : (
+          <div>입력 영상이 없습니다</div>
+        )}
       </div>
 
       {/* loading overlay */}

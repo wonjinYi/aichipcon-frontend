@@ -3,7 +3,7 @@ import "./VideoViewer.css";
 
 import { useSelector } from "react-redux";
 
-import generateChartData from "../scripts/generateChartData.js";
+import generateChartData from "../scripts/chartUtils.js";
 import {
   drawBoundingBoxes,
   updateCanvasSizeFromVideo,
