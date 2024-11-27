@@ -1,7 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 // 초기 상태
-const initialState = [];
+const initialState = {
+  editIndex: null,
+  data: [],
+};
 
 // Slice 생성
 const roiDataSlice = createSlice({
@@ -10,20 +13,34 @@ const roiDataSlice = createSlice({
   reducers: {
     addRoiItem: (state, action) => {
       const item = action.payload;
-      state.push(item);
+      state.data.push(item);
     },
     updateRoiItem: (state, action) => {
       const { index, item } = action.payload;
-      state[index] = item;
+      state.data[index] = item;
     },
     removeRoiItem: (state, action) => {
       const index = action.payload;
-      state.splice(index, 1);
+      state.data.splice(index, 1);
+    },
+    selectRoiItem: (state, action) => {
+      console.log(state);
+      console.log(action);
+      state.editIndex = action.payload;
+      console.log(state.editIndex);
+    },
+    unselectRoiItem: (state) => {
+      state.editIndex = null;
     },
   },
 });
 
 // 액션 및 리듀서 내보내기
-export const { addRoiItem, updateRoiItem, removeRoiItem } =
-  roiDataSlice.actions;
+export const {
+  addRoiItem,
+  updateRoiItem,
+  removeRoiItem,
+  selectRoiItem,
+  unselectRoiItem,
+} = roiDataSlice.actions;
 export default roiDataSlice.reducer;

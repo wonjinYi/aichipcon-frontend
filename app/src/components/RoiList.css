@@ -1,0 +1,83 @@
+.roi-list {
+    display : flex;
+    flex-direction : column;
+    gap : 8px;
+    padding : 12px;
+
+    height : 100%;
+    overflow-y: auto;
+}
+
+.roi-list .item {
+    display: flex;
+    align-items : center;
+    padding: 4px 12px;
+    min-height : 40px;
+    height : 40px;
+    border: 2px solid lightgray;
+    border-radius: 8px;
+    transition : all 0.2s;
+    cursor: pointer;
+}
+
+.roi-list .item:hover {
+    background-color: lightgray;
+}
+
+.roi-list .item.active {
+    background-color: rgb(249, 247, 188);
+}
+
+.roi-list .item .name {
+    flex: 1;
+    text-wrap: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size : 13px;
+    font-weight: 600;
+
+}
+
+.roi-list .item .delete-button {
+    display : flex;
+    justify-content : center;
+    align-items : center;
+    width : 24px;
+    height : 24px;
+    
+    border-radius: 4px;
+    
+    cursor: pointer;
+    transition : all 0.2s;
+
+}
+
+.roi-list .item .delete-button:hover {
+    background-color: lightcoral;
+    filter: brightness(0.8);
+}
+.roi-list .item .delete-button:hover img {
+    filter : brightness(0);
+}
+.roi-list .item .delete-button img {
+    width : 70%;
+    height : 70%;
+    max-width : 70%;
+    max-height : 70%;
+    object-fit : contain;
+}
+
+.roi-list .item.add-button {
+    justify-content: center;
+}
+.roi-list .item.add-button:hover {
+    background-color: rgb(163, 92, 255);
+}
+.roi-list .item.add-button:hover img {
+    filter: invert(1);
+}
+
+.roi-list .item.add-button img {
+    width : 24px;
+    height : 24px;
+}

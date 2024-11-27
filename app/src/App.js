@@ -36,10 +36,11 @@ function App() {
       {/* right container */}
       <div className="right-container">
         {frameData.length ? (
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/edit" element={<RoiEditor />} />
-          </Routes>
+          roiData.editIndex !== null ? (
+            <RoiEditor />
+          ) : (
+            <Dashboard />
+          )
         ) : (
           <div>입력 영상이 없습니다</div>
         )}
