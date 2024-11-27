@@ -60,18 +60,15 @@ def do_post(ort_output, conf_thres=0.3, iou_thres=0.4):
 
     boxes = []
     for idx, r in enumerate(x.numpy()):
-        pt1, pt2, conf, label = (
-            r[0:2].astype(int),
-            r[2:4].astype(int),
-            r[4],
-            r[5].astype(int),
-        )
+        xyxy = (r[0:4]/512)
+        conf = float(r[4])
+        cls_ = r[5].astype(int)
         # print("[{}] conf, classID, x1, y1, x2, y2, : {:.4f}, {}({}), {}, {}, {}, {}"
         #         .format(idx, conf, classes[label], label, pt1[0], pt1[1], pt2[0], pt2[1]))
         d = dict(
             zip(
-                "conf, class_id, x1, y1, x2, y2".split(", "),
-                [conf, label, pt1[0], pt1[1], pt2[0], pt2[1]],
+                "conf, cls, xywh".split(", "),
+                [float(conf), int(cls_), list(map(float, xyxy))], # TODO: change to xywh
             )
         )
         boxes.append(d)
@@ -109,6 +106,7 @@ class NPURuntime:
             input_names[2]: npu_output[2],
         }
         ort_output = self.sess.run(None, input_dict)
+        print(ort_output)
         # TODO: move do_post to this class
         boxes = do_post(ort_output, self.conf_thres, self.iou_thres)
         return boxes
