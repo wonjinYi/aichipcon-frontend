@@ -6,6 +6,7 @@ import {
   setStartFrame,
   setEndFrame,
   setCurrentFrame,
+  setFrameConfigStatus,
 } from "../stores/frameConfigSlice";
 
 function RangeSelector({ min, max }) {
@@ -16,6 +17,12 @@ function RangeSelector({ min, max }) {
     dispatch(setEndFrame(max));
   }, []);
 
+  const handleMouseDown = () => {
+    dispatch(setFrameConfigStatus("changing"));
+  };
+  const handleMouseUp = () => {
+    dispatch(setFrameConfigStatus("idle"));
+  };
   const handleChange = (targetName, _value) => {
     const value = parseInt(_value);
     if (targetName === "start" && value <= frameConfig.endFrame) {
@@ -47,6 +54,8 @@ function RangeSelector({ min, max }) {
           max={max}
           step={1}
           value={frameConfig.startFrame}
+          onMouseDown={handleMouseDown}
+          onMouseUp={handleMouseUp}
           onChange={(e) => handleChange("start", e.target.value)}
         />
         <input
@@ -65,6 +74,8 @@ function RangeSelector({ min, max }) {
           max={max}
           step={1}
           value={frameConfig.endFrame}
+          onMouseDown={handleMouseDown}
+          onMouseUp={handleMouseUp}
           onChange={(e) => handleChange("end", e.target.value)}
         />
       </div>

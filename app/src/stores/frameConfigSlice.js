@@ -6,6 +6,7 @@ const initialState = {
   endFrame: 1,
   currentFrame: 1,
   fps: 0,
+  status: "idle", // idle, changing
 };
 
 // Slice 생성
@@ -25,10 +26,19 @@ const frameConfigSlice = createSlice({
     setFps: (state, action) => {
       state.fps = action.payload;
     },
+    //
+    setFrameConfigStatus: (state, action) => {
+      state.status = action.payload; // idle, changing
+    },
   },
 });
 
 // 액션 및 리듀서 내보내기
-export const { setStartFrame, setEndFrame, setCurrentFrame, setFps } =
-  frameConfigSlice.actions;
+export const {
+  setStartFrame,
+  setEndFrame,
+  setCurrentFrame,
+  setFps,
+  setFrameConfigStatus,
+} = frameConfigSlice.actions;
 export default frameConfigSlice.reducer;
