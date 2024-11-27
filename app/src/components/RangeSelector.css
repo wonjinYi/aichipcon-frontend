@@ -3,7 +3,6 @@
     flex-direction: column;
     align-items: center;
     gap: 10px;
-    /* width: 400px; */
     width : 100%;
   }
   
@@ -11,13 +10,13 @@
     position: relative;
     width: 100%;
     height: 5px;
-    background: #ddd;
+    background: lightgray;
   }
   
   .range-slider-fill {
     position: absolute;
     height: 100%;
-    background: #007bff;
+    background: black;
   }
   
   .range-slider {
@@ -33,56 +32,52 @@
   .range-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     pointer-events: auto;
-    width: 20px;
+    width : 8px;
     height: 20px;
-    background: #007bff;
-    border: 2px solid white;
-    border-radius: 50%;
+    
+    border : 2px solid black;
+    border-radius : 2px;
+    
     cursor: pointer;
-
-    transform: translateY(-2px);
+    transform: translateX(-2px) translateY(-2px);
   }
   
   .range-slider::-moz-range-thumb {
     pointer-events: auto;
-    width: 20px;
+    width : 8px;
     height: 20px;
-    background: #007bff;
-    border: 2px solid white;
-    border-radius: 50%;
+    
+    border : 2px solid black;
+    border-radius : 2px;
+    
     cursor: pointer;
   }
 
   .range-slider.start-frame::-webkit-slider-thumb {
-    transform: translateX(-12px) translateY(-2px);
+    background: black;
   }
   .range-slider.start-frame::-moz-range-thumb {
-    transform: translateX(-12px) translateY(-2px);
+    background: black;
   }
   .range-slider.end-frame::-webkit-slider-thumb {
-    transform: translateX(8px) translateY(-2px);
+    background: black;
   }
   .range-slider.end-frame::-moz-range-thumb {
-    transform: translateX(8px) translateY(-2px);
+    background: black;
   }
   .range-slider.current-frame::-webkit-slider-thumb {
     background: white;
-    border : 2px solid #007bff;
-    width : 8px;
-    border-radius : 2px;
   }
   .range-slider.current-frame::-moz-range-thumb {
     background: white;
-    border : 2px solid #007bff;
-    width : 8px;
-    border-radius : 2px;
   }
   
   .range-values {
-    display: flex;
-    justify-content: space-between;
+    display : grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    text-align : center;
     width: 100%;
-    font-size: 10px;
-    color: #333;
+    font-size: 12px;
+    color: black;
   }
   

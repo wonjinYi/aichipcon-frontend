@@ -35,12 +35,9 @@ function RangeSelector({ min, max }) {
         <div
           className="range-slider-fill"
           style={{
-            left: `${
-              ((frameConfig.startFrame - min - 12) / (max - min)) * 100
-            }%`,
+            left: `${((frameConfig.startFrame - min) / (max - min)) * 100}%`,
             width: `${
-              ((frameConfig.endFrame - frameConfig.startFrame + 24) /
-                (max - min)) *
+              ((frameConfig.endFrame - frameConfig.startFrame) / (max - min)) *
               100
             }%`,
           }}
@@ -74,9 +71,9 @@ function RangeSelector({ min, max }) {
         />
       </div>
       <div className="range-values">
-        <span>Start: {frameConfig.startFrame}</span>
-        <span>Current: {frameConfig.currentFrame}</span>
-        <span>End: {frameConfig.endFrame}</span>
+        <span>구간 시작: {frameConfig.startFrame}</span>
+        <span>선택된 시점: {frameConfig.currentFrame}</span>
+        <span>구간 끝: {frameConfig.endFrame}</span>
       </div>
     </div>
   );
