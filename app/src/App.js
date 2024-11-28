@@ -17,13 +17,18 @@ function App() {
   const frameConfig = useSelector((state) => state.frameConfig);
 
   const [videoFile, setVideoFile] = useState(null);
+  const videoViewerRef = useRef(null);
+
+  useEffect(() => {
+    console.log(videoViewerRef);
+  }, [videoViewerRef]);
 
   return (
     <div className="app">
       <div className="left-container">
         <div className="left-top-container">
           {frameData.length ? (
-            <VideoViewer videoFile={videoFile} />
+            <VideoViewer videoFile={videoFile} ref={videoViewerRef} />
           ) : (
             <VideoSelector setVideoFile={setVideoFile} />
           )}
@@ -37,7 +42,7 @@ function App() {
       <div className="right-container">
         {frameData.length ? (
           roiData.editIndex !== null ? (
-            <RoiEditor />
+            <RoiEditor videoViewerRef={videoViewerRef} />
           ) : (
             <Dashboard />
           )

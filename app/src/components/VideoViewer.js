@@ -1,4 +1,10 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, {
+  useRef,
+  useState,
+  useEffect,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import "./VideoViewer.css";
 
 import { useSelector } from "react-redux";
@@ -11,9 +17,12 @@ import {
 
 import RangeSelector from "./RangeSelector.js";
 
-export default function VideoViewer({ videoFile }) {
+const VideoViewer = forwardRef(({ videoFile }, ref) => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
+  useImperativeHandle(ref, () => ({
+    getVideoElement: () => videoRef.current,
+  }));
 
   const frameData = useSelector((state) => state.frameData);
   const frameConfig = useSelector((state) => state.frameConfig);
@@ -60,4 +69,6 @@ export default function VideoViewer({ videoFile }) {
       </div>
     </div>
   );
-}
+});
+
+export default VideoViewer;
