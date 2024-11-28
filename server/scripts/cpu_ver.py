@@ -4,6 +4,8 @@ import onnxruntime
 import torch
 import torchvision
 from pathlib import Path
+from ultralytics import YOLO
+
 
 # yolo export model=yolov5su.pt format=onnx
 class CPURuntime:
@@ -15,9 +17,18 @@ class CPURuntime:
         self.iou_thres = 0.6
 
         # Load the ONNX model
-        onnx_model_path = Path(__file__).parent/onnx_model_path
+        onnx_model_path = Path(__file__).parent / onnx_model_path
         print("Loading ONNX model:", onnx_model_path)
         self.session = onnxruntime.InferenceSession(onnx_model_path)
+
+        self.model = YOLO("yolov5su.pt")
+
+    # def run_frame_with_yolo(self, frame):
+    #     results = self.model(frame, device="mps", verbose=False)
+    #     result = results[0]
+    #     for box in result.boxes:
+    #         out = {"cls": box[5], "conf": box[4], "xywh": box[:4]}
+    #         print(out)
 
     def run_frame(self, frame):
         # Preprocess the frame
@@ -82,7 +93,8 @@ class CPURuntime:
                 zip(
                     # ["x1", "y1", "x2", "y2", "conf", "class_id"],
                     # box.tolist() + [int(score), int(label)],
-                    ["cls", "conf", "xywh"], [int(label), float(score), list(map(float,box.tolist()))]
+                    ["cls", "conf", "xywh"],
+                    [int(label), float(score), list(map(float, box.tolist()))],
                 )
             )
             print(d)
