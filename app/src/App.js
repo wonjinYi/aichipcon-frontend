@@ -10,6 +10,7 @@ import RoiList from "./components/RoiList";
 import Dashboard from "./components/Dashboard";
 import RoiEditor from "./components/RoiEditor";
 import LoadingOverlay from "./components/LoadingOverlay.js";
+import CameraFeed from "./components/CameraFeed.js";
 
 function App() {
   const roiData = useSelector((state) => state.roiData); // user 슬라이스 상태
@@ -20,6 +21,7 @@ function App() {
 
   return (
     <div className="app">
+      <CameraFeed />
       <div className="left-container">
         <div className="left-top-container">
           {frameData.length ? (
