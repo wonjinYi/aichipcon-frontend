@@ -69,7 +69,10 @@ function App() {
             <Dashboard />
           )
         ) : (
-          <div>입력 영상이 없습니다</div>
+          <div className="no-source">
+            <img src="/images/empty.png" alt="no-source" />
+            <span>입력 영상이 없습니다</span>
+          </div>
         )}
       </div>
 

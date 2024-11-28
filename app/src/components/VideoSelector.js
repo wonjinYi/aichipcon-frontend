@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import "./VideoSelector.css";
 import axios from "axios";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -10,11 +11,16 @@ function VideoSelector({ setVideoFile }) {
   const dispatch = useDispatch();
   const frameData = useSelector((state) => state.frameData);
 
-  function onFileChange(e) {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.onchange = (e) => {
     const file = e.target.files[0];
-    console.log(file);
     setVideoFile(file);
     processVideo(file);
+  };
+
+  function openExploler(e) {
+    input.click();
   }
 
   async function processVideo(videoFile) {
@@ -51,8 +57,10 @@ function VideoSelector({ setVideoFile }) {
 
   return (
     <div className="video-selector">
-      <span className="description-text">비디오를 선택해주세요</span>
-      <input className="input-file" type="file" onChange={onFileChange} />
+      <span className="description-text">입력 영상을 선택해주세요</span>
+      <div className="button" onClick={openExploler}>
+        선택하기
+      </div>
     </div>
   );
 }
