@@ -30,7 +30,8 @@ function RoiEditor({ videoViewerRef }) {
     const deepCopied = JSON.parse(
       JSON.stringify(roiData.data[roiData.editIndex].points)
     );
-    setCurRoi(deepCopied);
+    const withoutClosePoint = deepCopied.slice(0, -1);
+    setCurRoi(withoutClosePoint);
     console.log(curRoi);
   }, [roiData.editIndex]);
 
@@ -45,10 +46,11 @@ function RoiEditor({ videoViewerRef }) {
       dispatch(addRoiItem(curRoi));
     } else {
       const item = roiData.data[roiData.editIndex];
+      const withClosePoint = curRoi.concat([curRoi[0]]);
       dispatch(
         updateRoiItem({
           index: roiData.editIndex,
-          item: { ...item, points: curRoi },
+          item: { ...item, points: withClosePoint },
         })
       );
     }
@@ -124,7 +126,9 @@ function RoiEditor({ videoViewerRef }) {
     curRoi && (
       <div className="roi-editor">
         <div className="header">
-          <div className="title">{curRoi.name} 편집</div>
+          <div className="title">
+            {roiData.data[roiData.editIndex].name} 편집
+          </div>
           <div
             className="cancel-button button"
             onClick={cancel}

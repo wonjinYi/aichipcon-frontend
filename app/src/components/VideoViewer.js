@@ -30,7 +30,7 @@ const VideoViewer = forwardRef(({ videoFile }, ref) => {
   const [videoSrc, setVideoSrc] = useState(null);
   const [frameDuration, setFrameDuration] = useState(0);
 
-  useEffect(() => setFrameDuration(1 / frameConfig.fps), [frameData]);
+  useEffect(() => setFrameDuration(1 / frameConfig.fps), [frameData.raw]);
   useEffect(() => {
     // set videoSrc
     setVideoSrc(URL.createObjectURL(videoFile));
@@ -43,10 +43,10 @@ const VideoViewer = forwardRef(({ videoFile }, ref) => {
   }, [videoFile]);
 
   useEffect(() => {
-    if (frameData.length === 0) return;
+    if (frameData.filtered.length === 0) return;
 
     const curFrame = frameConfig.currentFrame;
-    const boxes = frameData[curFrame - 1];
+    const boxes = frameData.filtered[curFrame - 1];
 
     videoRef.current.currentTime = curFrame * frameDuration;
     drawBoundingBoxes(canvasRef.current, boxes);
@@ -65,7 +65,7 @@ const VideoViewer = forwardRef(({ videoFile }, ref) => {
         <canvas ref={canvasRef}></canvas>
       </div>
       <div className="controls">
-        <RangeSelector min={1} max={frameData.length} />
+        <RangeSelector min={1} max={frameData.raw.length} />
       </div>
     </div>
   );

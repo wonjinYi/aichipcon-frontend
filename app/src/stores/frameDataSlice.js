@@ -1,7 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 // 초기 상태
-const initialState = [];
+const initialState = {
+  raw: [],
+  filtered: [],
+};
 
 // Slice 생성
 const frameDataSlice = createSlice({
@@ -9,11 +12,14 @@ const frameDataSlice = createSlice({
   initialState,
   reducers: {
     setFrameData: (state, action) => {
-      return action.payload;
+      state.raw = action.payload;
+    },
+    setFilteredFrameData: (state, action) => {
+      state.filtered = action.payload; // App.js에서 frameData.raw, roiData 변화가 있을 때 다시 계산
     },
   },
 });
 
 // 액션 및 리듀서 내보내기
-export const { setFrameData } = frameDataSlice.actions;
+export const { setFrameData, setFilteredFrameData } = frameDataSlice.actions;
 export default frameDataSlice.reducer;

@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Routes, Route } from "react-router-dom";
-import { useSelector } from "react-redux";
 import "./App.css";
+import { Routes, Route } from "react-router-dom";
+
+import { useSelector, useDispatch } from "react-redux";
+import { setFilteredFrameData } from "./stores/frameDataSlice.js";
 
 import VideoSelector from "./components/VideoSelector";
 import VideoViewer from "./components/VideoViewer";
@@ -12,7 +14,12 @@ import RoiEditor from "./components/RoiEditor";
 import LoadingOverlay from "./components/LoadingOverlay.js";
 // import CameraFeed from "./components/CameraFeed.js";
 
+import unionPolygons from "./scripts/unionPolygons.js";
+import calculateIou from "./scripts/calculateIou.js";
+
 function App() {
+  const dispatch = useDispatch();
+
   const roiData = useSelector((state) => state.roiData); // user 슬라이스 상태
   const frameData = useSelector((state) => state.frameData);
   const frameConfig = useSelector((state) => state.frameConfig);
@@ -21,15 +28,28 @@ function App() {
   const videoViewerRef = useRef(null);
 
   useEffect(() => {
-    console.log(videoViewerRef);
-  }, [videoViewerRef]);
+    if (!frameData.raw.length) return;
+
+    const { raw } = frameData;
+
+    const unionedPolygon = unionPolygons(roiData.data);
+    if (!unionedPolygon) {
+      dispatch(setFilteredFrameData(raw));
+      return;
+    }
+
+    const iouFilteredData = raw.map((boxes) =>
+      boxes.filter((box) => calculateIou(box, unionedPolygon) >= 0.5)
+    );
+    dispatch(setFilteredFrameData(iouFilteredData));
+  }, [frameData.raw, roiData]);
 
   return (
     <div className="app">
       {/* <CameraFeed /> */}
       <div className="left-container">
         <div className="left-top-container">
-          {frameData.length ? (
+          {frameData.raw.length ? (
             <VideoViewer videoFile={videoFile} ref={videoViewerRef} />
           ) : (
             <VideoSelector setVideoFile={setVideoFile} />
@@ -42,7 +62,7 @@ function App() {
 
       {/* right container */}
       <div className="right-container">
-        {frameData.length ? (
+        {frameData.raw.length ? (
           roiData.editIndex !== null ? (
             <RoiEditor videoViewerRef={videoViewerRef} />
           ) : (

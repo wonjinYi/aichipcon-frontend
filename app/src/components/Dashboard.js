@@ -29,9 +29,9 @@ function Dashboard() {
 
   // init
   useEffect(() => {
-    const _classCountData = generateClassCountData(frameData);
+    const _classCountData = generateClassCountData(frameData.filtered);
     setClassCountData(_classCountData);
-  }, [frameData]);
+  }, [frameData.filtered]);
 
   useEffect(() => {
     if (classCountData) updateChartData();
