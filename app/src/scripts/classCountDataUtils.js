@@ -32,5 +32,9 @@ export function sliceClassCountInRange(classCountData, frameConfig) {
     frameConfig.startFrame - 1,
     frameConfig.endFrame
   );
-  return sliced;
+  return {
+    data: sliced,
+    startFrame: frameConfig.startFrame,
+    endFrame: frameConfig.endFrame,
+  };
 }

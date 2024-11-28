@@ -36,7 +36,11 @@ export function generateTotalCountChartData(classCountObj) {
   };
 }
 
-export function generatePerFrameCountChartData(classCountObjs) {
+export function generatePerFrameCountChartData(
+  classCountObjs,
+  startFrame,
+  endFrame
+) {
   /* 
     classCountObjs = [
       {
@@ -57,7 +61,7 @@ export function generatePerFrameCountChartData(classCountObjs) {
 
   // Prepare dataset for each class
   const chartData = {
-    labels: classCountObjs.map((_, index) => `${index}`), // Frame labels
+    labels: classCountObjs.map((_, index) => `${startFrame + index}`), // Frame labels
     datasets: classNames.map((className, index) => ({
       label: className,
       data: classCountObjs.map((frame) => frame[className] || 0), // Use 0 if key is missing

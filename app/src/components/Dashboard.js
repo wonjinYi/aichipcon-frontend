@@ -50,8 +50,15 @@ function Dashboard() {
     setTotalCountChartData(_totalCountChartData);
 
     // 구간 내 프레임별 클래스 카운트 차트 데이터 만들기
-    const sliced = sliceClassCountInRange(classCountData, frameConfig);
-    const _perFrameCountChartData = generatePerFrameCountChartData(sliced);
+    const { data, startFrame, endFrame } = sliceClassCountInRange(
+      classCountData,
+      frameConfig
+    );
+    const _perFrameCountChartData = generatePerFrameCountChartData(
+      data,
+      startFrame,
+      endFrame
+    );
     setPerFrameCountChartData(_perFrameCountChartData);
   }
 
