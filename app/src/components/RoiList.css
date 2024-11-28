@@ -21,11 +21,11 @@
 }
 
 .roi-list .item:hover {
-    background-color: lightgray;
+    background-color: rgb(209, 209, 209);
 }
 
 .roi-list .item.active {
-    background-color: rgb(249, 247, 188);
+    background-color: rgb(220, 199, 250);
 }
 
 .roi-list .item .name {

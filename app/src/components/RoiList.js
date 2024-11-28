@@ -10,7 +10,7 @@ import {
   unselectRoiItem,
 } from "../stores/roiDataSlice.js";
 
-function RoiList() {
+function RoiList({ videoFile }) {
   const dispatch = useDispatch();
   const roiData = useSelector((state) => state.roiData);
 
@@ -32,6 +32,10 @@ function RoiList() {
     dispatch(removeRoiItem(index));
   };
   const editItem = (index) => {
+    if (!videoFile) {
+      alert("영상을 먼저 선택해주세요");
+      return;
+    }
     dispatch(selectRoiItem(index));
   };
 

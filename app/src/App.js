@@ -56,7 +56,7 @@ function App() {
           )}
         </div>
         <div className="left-bottom-container">
-          <RoiList />
+          <RoiList videoFile={videoFile} />
         </div>
       </div>
 
