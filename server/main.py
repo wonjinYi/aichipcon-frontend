@@ -2,12 +2,14 @@ from pathlib import Path
 import uvicorn
 import tempfile
 from ultralytics import YOLO
-from fastapi import FastAPI, File, UploadFile, Query, HTTPException
+from fastapi import FastAPI, File, UploadFile, Query, HTTPException, WebSocket
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 import cv2
 import json
 import logging
+import base64
+import asyncio
 
 
 def get_runtime():
@@ -45,29 +47,31 @@ def detect_objects(camera_index: int):
     while True:
         ret, frame = cap.read()
         if not ret:
-            continue
+            break
         frame_idx += 1
         if frame_idx % 3 == 0:
             continue
         # run object detection and draw bboxes
         boxes = my_runtime.run_frame(frame)
-        for box in boxes:
-            print(box)
-            frame = cv2.rectangle(
-                frame,
-                (0, 0),
-                (100, 100),
-                (0, 255, 0),
-                2,
-            )
+        _, png = cv2.imencode(".png", frame)
 
-        # _, jpeg = cv2.imencode(".jpg", annotated_frame)
-        _, jpeg = cv2.imencode(".jpg", frame)
-
-        yield (
-            b"--frame\r\n"
-            b"Content-Type: image/jpeg\r\n\r\n" + jpeg.tobytes() + b"\r\n"
-        )
+        # # Define a generator for the response
+        # def multi_part_response(img_buffer, bbox_list):
+        #     return "".join(
+        #         [
+        #             b"--boundary\r\n",
+        #             b"Content-Type: image/png\r\n\r\n",
+        #             img_buffer.tobytes(),
+        #             b"\r\n",
+        #             b"--boundary\r\n",
+        #             b"Content-Type: application/json\r\n\r\n",
+        #             json.dumps(bbox_list).encode("utf-8"),
+        #             b"\r\n--boundary--\r\n",
+        #         ]
+        #     )
+        # yield multi_part_response(png, boxes)
+        # yield "\r\r\r\r\r".join([str(png.tobytes()), json.dumps(boxes)])
+        yield {"image": png.tobytes(), "boxes": boxes}
 
 
 def run_video(video_path: str):
@@ -146,13 +150,52 @@ def upload_video(video: UploadFile = File):
     return JSONResponse(content=response_content)
 
 
+@app.websocket("/ws/video_stream")
+async def video_stream(
+    websocket: WebSocket,
+    camera_index: int = Query(0, description="Index of the camera"),
+):
+    await websocket.accept()
+    cap = cv2.VideoCapture(camera_index)  # Capture from the default camera
+    try:
+        my_runtime = get_runtime()
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
+            # run object detection
+            boxes = my_runtime.run_frame(frame)
+            # Encode frame as JPEG
+            _, buffer = cv2.imencode(".jpg", frame)
+            frame_bytes = buffer.tobytes()
+            # Encode frame in base64 to send over WebSocket
+            frame_base64 = base64.b64encode(frame_bytes).decode("utf-8")
+
+            # Send both frame and JSON data
+            await websocket.send_json({"frame": frame_base64, "boxes": boxes})
+
+            await asyncio.sleep(0.033)  # Approximate 30 FPS
+    except Exception as e:
+        print(f"Error: {e}")
+    finally:
+        cap.release()
+        await websocket.close()
+
+
 @app.get("/video_feed")
 def video_feed(camera_index: int = Query(0, description="Index of the camera")):
     try:
-        return StreamingResponse(
-            detect_objects(camera_index),
-            media_type="multipart/x-mixed-replace; boundary=frame",
+        res = detect_objects(camera_index)
+        print(res)
+        # headers = {"Content-Type": "multipart/x-mixed-replace; boundary=boundary"}
+        # headers = {"Content-Type": "multipart/mixed; boundary=boundary"}
+        resp = StreamingResponse(
+            res,
+            # media_type="multipart/mixed; boundary=boundary",
+            # headers=headers,
         )
+        print(resp)
+        return resp
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -171,12 +214,12 @@ def list_cameras():
     for i in range(3):
         try:
             cap = cv2.VideoCapture(i)
-            if not cap.read()[1]:
-                break
+            if cap.get(cv2.CAP_PROP_FPS):
+                cameras.append(i)
             else:
                 cameras.append(i)
             cap.release()
         except:
             break
     print(cameras)
-    return [0, 1, 2]
+    return cameras

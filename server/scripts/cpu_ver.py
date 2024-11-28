@@ -97,6 +97,6 @@ class CPURuntime:
                     [int(label), float(score), list(map(float, box.tolist()))],
                 )
             )
-            print(d)
+            # print(d)
             result.append(d)
         return result

@@ -12,7 +12,7 @@ import RoiList from "./components/RoiList";
 import Dashboard from "./components/Dashboard";
 import RoiEditor from "./components/RoiEditor";
 import LoadingOverlay from "./components/LoadingOverlay.js";
-// import CameraFeed from "./components/CameraFeed.js";
+import CameraFeed from "./components/CameraFeed.js";
 
 import unionPolygons from "./scripts/unionPolygons.js";
 import calculateIou from "./scripts/calculateIou.js";
