@@ -211,13 +211,13 @@ def get_fps(video_path):
 def list_cameras():
     # List all available cameras
     cameras = []
-    for i in range(3):
+    for i in range(10):
         try:
             cap = cv2.VideoCapture(i)
             if cap.get(cv2.CAP_PROP_FPS):
                 cameras.append(i)
             else:
-                cameras.append(i)
+                continue
             cap.release()
         except:
             break
