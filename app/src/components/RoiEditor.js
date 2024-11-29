@@ -11,7 +11,7 @@ import {
 
 import { updateRoiCanvas } from "../scripts/roiCanvasUtils.js";
 
-function RoiEditor({ videoViewerRef }) {
+function RoiEditor({ videoViewerRef, cameraViewerRef, inputMode }) {
   const dispatch = useDispatch();
 
   const editorBodyRef = useRef(null);
@@ -66,17 +66,19 @@ function RoiEditor({ videoViewerRef }) {
   const [pointThreshold, setPointThreshold] = useState(0);
 
   useEffect(() => {
-    if (
-      !videoViewerRef ||
-      !videoViewerRef.current ||
-      !editorBodyRef ||
-      !canvasRef ||
-      !canvasWrapRef
-    )
-      return;
+    if (!editorBodyRef || !canvasRef || !canvasWrapRef) return;
 
-    const video = videoViewerRef.current.getVideoElement();
+    let video = null;
+    if (inputMode === "file") {
+      if (!videoViewerRef || !videoViewerRef.current) return;
+      video = videoViewerRef.current.getVideoElement();
+    } else if (inputMode === "camera") {
+      if (!cameraViewerRef || !cameraViewerRef.current) return;
+      video = cameraViewerRef.current.getImageElement();
+    }
     if (!video) return;
+
+    console.log(video);
 
     const editorBody = editorBodyRef.current;
     const canvas = canvasRef.current;

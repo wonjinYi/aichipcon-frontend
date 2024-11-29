@@ -9,7 +9,9 @@ export function updateRoiCanvas(
   dragPointIdx,
   hoverPointIdx
 ) {
-  const aspect = video.videoWidth / video.videoHeight;
+  let aspect = 1;
+  if (video.width) aspect = video.width / video.height;
+  else if (video.videoWidth) aspect = video.videoWidth / video.videoHeight;
 
   const bodyWidth = editorBody.clientWidth;
   const bodyHeight = editorBody.clientHeight;

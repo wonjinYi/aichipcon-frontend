@@ -5,6 +5,9 @@ const initialState = {
   startFrame: 1,
   endFrame: 1,
   currentFrame: 1,
+
+  lockEndFrameToMax: true,
+
   fps: 0,
   status: "idle", // idle, changing
 };

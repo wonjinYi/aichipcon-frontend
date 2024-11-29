@@ -1,3 +1,18 @@
+export const COLOR_PALETTE = [
+  "#FF6384",
+  "#36A2EB",
+  "#FFCE56",
+  "#4BC0C0",
+  "#9966FF",
+  "#FF9F40",
+  "#E7E9ED",
+  "#00A5CF",
+  "#845EC2",
+  "#FFC75F",
+  "#F9F871",
+  "#D65DB1",
+];
+
 export const CLASS_NAME = [
   "person",
   "bicycle",

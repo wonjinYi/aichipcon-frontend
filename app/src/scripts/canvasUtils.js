@@ -1,4 +1,4 @@
-import { CLASS_NAME } from "../constants.js";
+import { CLASS_NAME, COLOR_PALETTE } from "../constants.js";
 
 /**
  * Resize canvas to match the video size
@@ -10,6 +10,7 @@ export function updateCanvasSizeFromVideo(canvasElement, videoElement) {
   if (!canvasElement || !videoElement) return;
 
   const rect = videoElement.getBoundingClientRect();
+  console.log(rect.width, rect.height);
   canvasElement.width = rect.width;
   canvasElement.height = rect.height;
 
@@ -39,8 +40,9 @@ export function drawBoundingBoxes(canvasElement, _boxes) {
 
     const classId = box.cls;
     const className = CLASS_NAME[classId];
+    const color = COLOR_PALETTE[classId % COLOR_PALETTE.length];
 
-    let boxColor = box.cls === 0 ? "red" : "green";
+    let boxColor = box.cls === 0 ? "red" : color;
 
     const rectWidth = w * sourceW;
     const rectHeight = h * sourceH;
@@ -49,11 +51,13 @@ export function drawBoundingBoxes(canvasElement, _boxes) {
 
     // draw bounding box
     context.strokeStyle = boxColor;
-    context.lineWidth = 1;
+    context.lineWidth = 2;
     context.strokeRect(rectX, rectY, rectWidth, rectHeight);
+
     // draw text
     context.fillStyle = boxColor;
-    context.font = "10px Noto Sans";
+    context.font = "bold 13px Noto Sans";
+    //bold
     context.fillText(className, rectX, rectY - 4);
   });
 }

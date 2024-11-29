@@ -7,6 +7,7 @@ import { setFilteredFrameData } from "./stores/frameDataSlice.js";
 
 import VideoSelector from "./components/VideoSelector";
 import VideoViewer from "./components/VideoViewer";
+import CameraViewer from "./components/CameraViewer";
 import RoiList from "./components/RoiList";
 
 import Dashboard from "./components/Dashboard";
@@ -24,8 +25,11 @@ function App() {
   const frameData = useSelector((state) => state.frameData);
   const frameConfig = useSelector((state) => state.frameConfig);
 
+  const [inputMode, setInputMode] = useState(null);
+  const [cameraIdx, setCameraIdx] = useState(null);
   const [videoFile, setVideoFile] = useState(null);
   const videoViewerRef = useRef(null);
+  const cameraViewerRef = useRef(null);
 
   useEffect(() => {
     if (!frameData.raw.length) return;
@@ -49,22 +53,34 @@ function App() {
       {/* <CameraFeed /> */}
       <div className="left-container">
         <div className="left-top-container">
-          {frameData.raw.length ? (
-            <VideoViewer videoFile={videoFile} ref={videoViewerRef} />
+          {inputMode ? (
+            inputMode === "file" ? (
+              <VideoViewer videoFile={videoFile} ref={videoViewerRef} />
+            ) : (
+              <CameraViewer cameraIdx={cameraIdx} ref={cameraViewerRef} />
+            )
           ) : (
-            <VideoSelector setVideoFile={setVideoFile} />
+            <VideoSelector
+              setVideoFile={setVideoFile}
+              setInputMode={setInputMode}
+              setCameraIdx={setCameraIdx}
+            />
           )}
         </div>
         <div className="left-bottom-container">
-          <RoiList videoFile={videoFile} />
+          <RoiList inputMode={inputMode} />
         </div>
       </div>
 
       {/* right container */}
       <div className="right-container">
-        {frameData.raw.length ? (
+        {inputMode ? (
           roiData.editIndex !== null ? (
-            <RoiEditor videoViewerRef={videoViewerRef} />
+            <RoiEditor
+              videoViewerRef={videoViewerRef}
+              cameraViewerRef={cameraViewerRef}
+              inputMode={inputMode}
+            />
           ) : (
             <Dashboard />
           )

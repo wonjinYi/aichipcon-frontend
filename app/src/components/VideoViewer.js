@@ -64,9 +64,11 @@ const VideoViewer = forwardRef(({ videoFile }, ref) => {
         />
         <canvas ref={canvasRef}></canvas>
       </div>
-      <div className="controls">
-        <RangeSelector min={1} max={frameData.raw.length} />
-      </div>
+      {frameData.raw.length && (
+        <div className="controls">
+          <RangeSelector min={1} max={frameData.raw.length} />
+        </div>
+      )}
     </div>
   );
 });

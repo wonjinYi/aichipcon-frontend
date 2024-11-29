@@ -7,20 +7,47 @@ import { setFrameData } from "../stores/frameDataSlice";
 import { setFps } from "../stores/frameConfigSlice";
 import { startLoading, endLoading } from "../stores/loadingSlice";
 
-function VideoSelector({ setVideoFile }) {
+function VideoSelector({ setVideoFile, setInputMode, setCameraIdx }) {
   const dispatch = useDispatch();
   const frameData = useSelector((state) => state.frameData);
+
+  const [cameras, setCameras] = useState([]);
 
   const input = document.createElement("input");
   input.type = "file";
   input.onchange = (e) => {
     const file = e.target.files[0];
     setVideoFile(file);
+    setInputMode("file");
     processVideo(file);
   };
 
   function openExploler(e) {
     input.click();
+  }
+
+  function getCameras() {
+    if (cameras.length) {
+      setCameras([]);
+      return;
+    }
+
+    axios
+      .get(`http://localhost:8080/list_cameras`)
+      .then((response) => {
+        console.log("Cameras:", response.data);
+        setCameras(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching cameras:", error);
+      });
+
+    console.log("getCameras");
+  }
+  function selectCamera(camera) {
+    console.log("selectCamera idx: ", camera);
+    setInputMode("camera");
+    setCameraIdx(camera);
   }
 
   async function processVideo(videoFile) {
@@ -57,9 +84,26 @@ function VideoSelector({ setVideoFile }) {
 
   return (
     <div className="video-selector">
-      <span className="description-text">입력 영상을 선택해주세요</span>
+      <span className="description-text">영상을 입력해주세요</span>
+      <div className="divider"></div>
       <div className="button" onClick={openExploler}>
-        선택하기
+        동영상 파일 선택
+      </div>
+      <div className="divider"></div>
+      <div className="button" onClick={getCameras}>
+        실시간 카메라 선택
+      </div>
+      {/* 카메라 목록 */}
+      <div className="camera-list">
+        {cameras.map((camera) => (
+          <div
+            className="button camera"
+            onClick={(e) => selectCamera(camera)}
+            key={camera}
+          >
+            {camera}번
+          </div>
+        ))}
       </div>
     </div>
   );

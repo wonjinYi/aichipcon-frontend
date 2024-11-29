@@ -14,6 +14,7 @@ function RangeSelector({ min, max }) {
   const frameConfig = useSelector((state) => state.frameConfig);
 
   useEffect(() => {
+    console.log(max);
     dispatch(setEndFrame(max));
   }, []);
 
