@@ -33,8 +33,10 @@ function App() {
 
   useEffect(() => {
     if (!frameData.raw.length) return;
+    if (roiData.editIndex !== null) return;
     const { raw } = frameData;
 
+    console.log("app useEFfect", roiData.editIndex);
     const unionedPolygon = unionPolygons(roiData.data);
     if (!unionedPolygon) {
       dispatch(setFilteredFrameData(raw));
