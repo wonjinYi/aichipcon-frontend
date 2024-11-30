@@ -85,8 +85,6 @@ function App() {
 
     const objectCounts = {};
 
-    // {"class": c, "confidence": co, "coordinates": xy}
-    console.log("Frame data:", frames[frameIndex]);
     frames[frameIndex].forEach((obj) => {
       const classId = obj.class;
       if (objectCounts[classId]) {
@@ -96,12 +94,10 @@ function App() {
       }
     });
 
-    console.log("Object counts:", objectCounts);
     const labels = Object.keys(objectCounts).map(
       (classId) => `Class ${classId}`
     );
     const data = Object.values(objectCounts);
-    console.log(data);
 
     const chartData = {
       labels: labels,
@@ -137,7 +133,6 @@ function App() {
   };
 
   const handleSliderChange = (event, newValue) => {
-    console.log("Slider value:", newValue);
     setCurrentFrame(newValue);
     generateChartData(frameData, newValue);
     if (videoRef.current) {
@@ -155,7 +150,6 @@ function App() {
 
     // Assuming frameData contains bounding box information for each frame
     const boxes = frameData[frame];
-    console.log("drawBoundingBoxes", frame, boxes);
     boxes.forEach((box) => {
       let [x, y, w, h] = box.xywh;
       let [sourceW, sourceH] = [canvas.width, canvas.height];
@@ -167,12 +161,7 @@ function App() {
       // draw text
       context.fillStyle = boxColor;
       context.font = "5px Noto Sans";
-      context.fillText(
-        `${box.cls}//${box.conf}`,
-        x * sourceW,
-        y * sourceH
-      );
-      console.log(x * sourceW, y * sourceH, w * sourceW, h * sourceH);
+      context.fillText(`${box.cls}//${box.conf}`, x * sourceW, y * sourceH);
     });
   };
 

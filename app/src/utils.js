@@ -5,8 +5,7 @@ export const useWebSocket = (url, onMessage) => {
     const ws = new WebSocket(url);
     // ws.onmessage = (event) => onMessage(JSON.parse(event.data));
     ws.onmessage = (event) => {
-      console.log("Message from server: ", event.data);
-      if (onMessage){
+      if (onMessage) {
         onMessage(JSON.parse(event.data));
       }
     };
@@ -14,7 +13,6 @@ export const useWebSocket = (url, onMessage) => {
     return () => ws.close();
   }, [url, onMessage]);
 };
-
 
 // const useWebSocket = (url) => {
 //   useEffect(() => {
@@ -25,5 +23,3 @@ export const useWebSocket = (url, onMessage) => {
 //     return () => ws.close();
 //   }, [url]);
 // };
-
-

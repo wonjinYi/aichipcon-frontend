@@ -24,10 +24,7 @@ const roiDataSlice = createSlice({
       state.data.splice(index, 1);
     },
     selectRoiItem: (state, action) => {
-      console.log(state);
-      console.log(action);
       state.editIndex = action.payload;
-      console.log(state.editIndex);
     },
     unselectRoiItem: (state) => {
       state.editIndex = null;

@@ -32,7 +32,6 @@ function RoiEditor({ videoViewerRef, cameraViewerRef, inputMode }) {
     );
     const withoutClosePoint = deepCopied.slice(0, -1);
     setCurRoi(withoutClosePoint);
-    console.log(curRoi);
   }, [roiData.editIndex]);
 
   function cancel() {
@@ -78,8 +77,6 @@ function RoiEditor({ videoViewerRef, cameraViewerRef, inputMode }) {
     }
     if (!video) return;
 
-    console.log(video);
-
     const editorBody = editorBodyRef.current;
     const canvas = canvasRef.current;
     const canvasWrap = canvasWrapRef.current;
@@ -99,7 +96,6 @@ function RoiEditor({ videoViewerRef, cameraViewerRef, inputMode }) {
     const x = (event.clientX - rect.left) / rect.width;
     const y = (event.clientY - rect.top) / rect.height;
 
-    console.log(curRoi);
     const pointIndex = curRoi.findIndex(
       ([px, py]) => Math.hypot(px - x, py - y) < pointThreshold
     );

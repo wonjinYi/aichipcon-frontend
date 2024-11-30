@@ -35,17 +35,13 @@ function VideoSelector({ setVideoFile, setInputMode, setCameraIdx }) {
     axios
       .get(`http://localhost:8080/list_cameras`)
       .then((response) => {
-        console.log("Cameras:", response.data);
         setCameras(response.data);
       })
       .catch((error) => {
         console.error("Error fetching cameras:", error);
       });
-
-    console.log("getCameras");
   }
   function selectCamera(camera) {
-    console.log("selectCamera idx: ", camera);
     setInputMode("camera");
     setCameraIdx(camera);
   }
@@ -67,12 +63,10 @@ function VideoSelector({ setVideoFile, setInputMode, setCameraIdx }) {
           },
         }
       );
-      console.log(response);
+
       if (response.data) {
         dispatch(setFps(response.data.fps));
         dispatch(setFrameData(response.data.data));
-        console.log("Frame data:", response.data);
-        console.log("frameData store", frameData);
       }
     } catch (error) {
       console.error("Error processing video:", error);
