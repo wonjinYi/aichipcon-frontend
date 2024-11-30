@@ -54,17 +54,47 @@ export function generatePerFrameCountChartData(
     ]
   */
 
+  const len = classCountObjs.length;
+  const summarizeUnit = Math.ceil(len / 50);
+
+  // 프레임 데이터를 요약
+  const summarizedData = [];
+  for (let i = 0; i < len; i += summarizeUnit) {
+    const summarizedFrame = {};
+
+    // 요약할 범위 (i부터 i + summarizeUnit까지)
+    for (let j = i; j < Math.min(i + summarizeUnit, len); j++) {
+      const frame = classCountObjs[j];
+      for (const [className, count] of Object.entries(frame)) {
+        summarizedFrame[className] = (summarizedFrame[className] || 0) + count; // 각 클래스의 합산
+      }
+    }
+
+    summarizedData.push(summarizedFrame);
+  }
+
   // Extract unique class names
   const classNames = Array.from(
-    new Set(classCountObjs.flatMap((frame) => Object.keys(frame)))
+    new Set(summarizedData.flatMap((frame) => Object.keys(frame)))
   );
 
   // Prepare dataset for each class
   const chartData = {
-    labels: classCountObjs.map((_, index) => `${startFrame + index}`), // Frame labels
+    labels: summarizedData.map((_, index) => {
+      const rangeStart = startFrame + index * summarizeUnit;
+      const rangeEnd = Math.min(
+        startFrame + (index + 1) * summarizeUnit - 1,
+        endFrame
+      );
+      if (rangeStart === rangeEnd) {
+        return `${rangeStart}`;
+      } else {
+        return `${rangeStart}-${rangeEnd}`;
+      }
+    }), // Frame labels
     datasets: classNames.map((className, index) => ({
       label: className,
-      data: classCountObjs.map((frame) => frame[className] || 0), // Use 0 if key is missing
+      data: summarizedData.map((frame) => frame[className] || 0), // Use 0 if key is missing
       backgroundColor: COLOR_PALETTE[index % COLOR_PALETTE.length],
     })),
   };

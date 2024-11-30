@@ -32,6 +32,7 @@ const CameraViewer = forwardRef(({ cameraIdx }, ref) => {
   const frameConfig = useSelector((state) => state.frameConfig);
 
   const [images, setImages] = useState([]);
+
   const [pause, setPause] = useState(false);
   const pauseRef = useRef(pause);
   useEffect(() => {
@@ -74,29 +75,45 @@ const CameraViewer = forwardRef(({ cameraIdx }, ref) => {
     if (pauseRef.current) return;
     let message = JSON.parse(event.data);
 
-    dispatch(pushFrameData(message.boxes));
-
     const img = "data:image/jpeg;base64," + message.frame;
     setImages((prev) => [...prev, img]);
+
+    dispatch(pushFrameData(message.boxes));
   }
 
   useEffect(() => {
     const rawLen = frameData.raw.length;
+    const cur = frameConfig.currentFrame;
     const end = frameConfig.endFrame;
     if (rawLen - end < 2) {
       dispatch(setEndFrame(frameData.raw.length));
     }
+    if (rawLen - cur < 2) {
+      dispatch(setCurrentFrame(frameData.raw.length));
+    }
   }, [frameData.raw]);
+
+  // useEffect(() => {
+  //   if (frameData.filtered.length === 0) return;
+  //   if (frameConfig.status !== "idle") return;
+
+  //   const curFrame = frameConfig.currentFrame;
+  //   const boxes = frameData.filtered[curFrame - 1];
+
+  //   updateCanvasSizeFromVideo(canvasRef.current, imageRef.current);
+  //   drawBoundingBoxes(canvasRef.current, boxes);
+  // }, [frameConfig.currentFrame]);
 
   useEffect(() => {
     if (frameData.filtered.length === 0) return;
+    if (frameConfig.status !== "idle") return;
 
     const curFrame = frameConfig.currentFrame;
     const boxes = frameData.filtered[curFrame - 1];
-    console.log(curFrame, boxes);
+
     updateCanvasSizeFromVideo(canvasRef.current, imageRef.current);
     drawBoundingBoxes(canvasRef.current, boxes);
-  }, [frameConfig.currentFrame]);
+  }, [frameConfig.status]);
 
   return (
     <div className="camera-viewer">
@@ -108,6 +125,10 @@ const CameraViewer = forwardRef(({ cameraIdx }, ref) => {
         />
         <canvas ref={canvasRef}></canvas>
       </div>
+      {/* 비활성화 오버레이 */}
+      {frameConfig.status === "changing" && (
+        <div className="disabled-overlay"></div>
+      )}
       <div className="controls">
         <RangeSelector min={1} max={frameData.raw.length} />
       </div>

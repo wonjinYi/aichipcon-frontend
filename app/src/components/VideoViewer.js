@@ -42,15 +42,27 @@ const VideoViewer = forwardRef(({ videoFile }, ref) => {
     window.addEventListener("resize", callback);
   }, [videoFile]);
 
+  // useEffect(() => {
+  //   if (frameData.filtered.length === 0) return;
+  //   if (frameConfig.status !== "idle") return;
+
+  //   const curFrame = frameConfig.currentFrame;
+  //   const boxes = frameData.filtered[curFrame - 1];
+
+  //   videoRef.current.currentTime = curFrame * frameDuration;
+  //   drawBoundingBoxes(canvasRef.current, boxes);
+  // }, [frameConfig.currentFrame]);
+
   useEffect(() => {
     if (frameData.filtered.length === 0) return;
+    if (frameConfig.status !== "idle") return;
 
     const curFrame = frameConfig.currentFrame;
     const boxes = frameData.filtered[curFrame - 1];
 
     videoRef.current.currentTime = curFrame * frameDuration;
     drawBoundingBoxes(canvasRef.current, boxes);
-  }, [frameConfig.currentFrame]);
+  }, [frameConfig.status]);
 
   return (
     <div className="video-viewer">
@@ -64,6 +76,10 @@ const VideoViewer = forwardRef(({ videoFile }, ref) => {
         />
         <canvas ref={canvasRef}></canvas>
       </div>
+      {/* 비활성화 오버레이 */}
+      {frameConfig.status === "changing" && (
+        <div className="disabled-overlay"></div>
+      )}
       {frameData.raw.length && (
         <div className="controls">
           <RangeSelector min={1} max={frameData.raw.length} />

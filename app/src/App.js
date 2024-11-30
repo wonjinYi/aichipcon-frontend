@@ -33,7 +33,6 @@ function App() {
 
   useEffect(() => {
     if (!frameData.raw.length) return;
-
     const { raw } = frameData;
 
     const unionedPolygon = unionPolygons(roiData.data);

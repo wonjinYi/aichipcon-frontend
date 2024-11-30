@@ -61,15 +61,6 @@ function RangeSelector({ min, max }) {
         />
         <input
           type="range"
-          className="range-slider current-frame"
-          min={min}
-          max={max}
-          step={1}
-          value={frameConfig.currentFrame}
-          onChange={(e) => handleChange("current", e.target.value)}
-        />
-        <input
-          type="range"
           className="range-slider end-frame"
           min={min}
           max={max}
@@ -78,6 +69,17 @@ function RangeSelector({ min, max }) {
           onMouseDown={handleMouseDown}
           onMouseUp={handleMouseUp}
           onChange={(e) => handleChange("end", e.target.value)}
+        />
+        <input
+          type="range"
+          className="range-slider current-frame"
+          min={min}
+          max={max}
+          step={1}
+          value={frameConfig.currentFrame}
+          onMouseDown={handleMouseDown}
+          onMouseUp={handleMouseUp}
+          onChange={(e) => handleChange("current", e.target.value)}
         />
       </div>
       <div className="range-values">

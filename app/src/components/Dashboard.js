@@ -81,6 +81,10 @@ function Dashboard() {
   const stackedBarChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    animation: false, // 애니메이션 비활성화
+    plugins: {
+      tooltip: { enabled: false }, // 툴팁 비활성화
+    },
     scales: {
       x: {
         stacked: true, // X 축 누적 활성화

@@ -10,7 +10,6 @@ export function updateCanvasSizeFromVideo(canvasElement, videoElement) {
   if (!canvasElement || !videoElement) return;
 
   const rect = videoElement.getBoundingClientRect();
-  console.log(rect.width, rect.height);
   canvasElement.width = rect.width;
   canvasElement.height = rect.height;
 
