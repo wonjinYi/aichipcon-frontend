@@ -1,3 +1,10 @@
 fastapi[standard]
 uvicorn
 ultralytics
+asyncio
+torch
+torchvision
+tqdm
+pycocotools
+aiohttp
+aiofiles

@@ -10,3 +10,7 @@ AI 반도체 기술인재 선발대회
 ## client
 - npm install
 - npm start
+
+## Model Val
+- cd server/scripts
+- python3 runner2.py

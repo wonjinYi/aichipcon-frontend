@@ -61,7 +61,6 @@ def do_post(ort_output, conf_thres=0.3, iou_thres=0.4):
     boxes = []
     for idx, r in enumerate(x.numpy()):
         xyxy = (r[0:4]/512)
-        print(xyxy)
         xywh = [xyxy[0], xyxy[1], xyxy[2]-xyxy[0],xyxy[3]-xyxy[1]]
         conf = float(r[4])
         cls_ = r[5].astype(int)

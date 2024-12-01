@@ -172,6 +172,7 @@ async def video_stream(
             frame_base64 = base64.b64encode(frame_bytes).decode("utf-8")
 
             # Send both frame and JSON data
+            print([box["cls"] for box in boxes])
             await websocket.send_json({"frame": frame_base64, "boxes": boxes})
 
             await asyncio.sleep(0.033)  # Approximate 30 FPS

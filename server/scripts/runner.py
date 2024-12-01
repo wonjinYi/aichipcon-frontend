@@ -10,7 +10,6 @@ from ultralytics.utils import ops
 import torchvision
 from pathlib import Path
 import logging
-from config import *
 import time
 from cpu_ver import CPURuntime
 from npu_ver import NPURuntime
@@ -36,6 +35,7 @@ if __name__ == "__main__":
         my_runtime = CPURuntime(onnx_model_path=onnx_model_path)
 
     # video loop
+    video_path = "../videos/kickboard.mp4"
     cap = cv2.VideoCapture(str(video_path))
     # save the output video to "output.mp4"
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
@@ -54,35 +54,13 @@ if __name__ == "__main__":
             break
 
         boxes = my_runtime.run_frame(frame)
-        print(f"{frame_i:04}", collections.Counter([x["class_id"] for x in boxes]))
+        print(f"{frame_i:04}", collections.Counter([x["cls"] for x in boxes]))
         # Draw bounding boxes
         for box in boxes:
             # convert box (my_runtime.input_width, my_runtime.input_height) to frame size
-            conf, class_id = box["conf"], box["class_id"]
-            box = {
-                k: (
-                    v * frame.shape[1] / my_runtime.input_width
-                    if k in ["x1", "x2"]
-                    else v * frame.shape[0] / my_runtime.input_height
-                )
-                for k, v in box.items()
-                if k in ["x1", "y1", "x2", "y2"]
-            }
-            x1, y1, x2, y2 = map(int, [box["x1"], box["y1"], box["x2"], box["y2"]])
-            # print(frame.shape, box)
-            cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-            cv2.putText(
-                frame,
-                f"{class_id} {conf:.2f}",
-                (x1, y1 - 10),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                0.9,
-                (36, 255, 12),
-                2,
-            )
-
+            print(box)
         cv2.imshow("YOLOv5 Object Detection", frame)
-        out.write(frame)
+        # out.write(frame)
 
         # Break on 'q' key press
         if cv2.waitKey(1) & 0xFF == ord("q"):
