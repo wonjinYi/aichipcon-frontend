@@ -61,20 +61,27 @@ async def generate_detections(model, coco, input_shape):
             tasks.append(save_img2(session,a,b))
         await asyncio.gather(*tasks)
 
+    results = []
+    def xywhnorm2xyxysrc(xywh_normalized, input_shape):
+        x,y,w,h = map(lambda _:int(_*512), xywh_normalized)   
+        return [x,y,x+w,y+h]        
 
+    cache_dir_rglob = dict([(int(p.stem), p) for p in cache_dir.rglob("*.jpg")])
+    category_ids = set()
     for img_id in tqdm(coco.getImgIds(), desc="Processing images"):
-        boxes = model.run_frame(cv2.imread(img_path))
-        results = []
+        img_path = cache_dir_rglob[img_id]
+        cv2.imshow(str(img_path), cv2.imread(str(img_path)))
+        print(img_id, img_path)
+        im_input = cv2.imread(str(img_path)) 
+        boxes = model.run_frame(cv2.imread(str(img_path)))
         for box in boxes:
-            xywh_normalized = box["xywh"]
-            xywh = [
-                xywh_normalized[0]*input_shape[0],
-                xywh_normalized[1]*input_shape[1],
-                xywh_normalized[2]*input_shape[0],
-                xywh_normalized[3]*input_shape[1],
-                ]
+            xyxy = xywhnorm2xyxysrc(box["xywh"],(im_input.shape[1],im_input.shape[0]))
+            xywh = [xyxy[0],xyxy[1],xyxy[2]-xyxy[0],xyxy[3]-xyxy[1]]
+            print(xyxy, img_path, input_shape)
             score = box["conf"]
             cls = box["cls"]
+            category_ids.add(cls)
+            cv2.rectangle(im_input,list(map(int,xyxy[:2])), list(map(int, xyxy[2:])), (255,0,0),4)
             if score > CONF_THRESHOLD:
                 results.append(
                     {
@@ -84,18 +91,26 @@ async def generate_detections(model, coco, input_shape):
                         "score": float(score),
                     }
                 )
+
+        print(im_input.shape)
+        cv2.imshow("out",im_input)
+        # cv2.imwrite(f"out2/{img_id}.jpg",im_input)
+        exit()
+    print(">>> categoryids", category_ids)
     return results
 
 
 # Evaluate metrics
-def evaluate_coco(coco_gt, results):
+def evaluate_coco(coco_gt, results=[]):
     with open("results.json", "w") as f:
         json.dump(results, f)
     coco_dt = coco_gt.loadRes("results.json")
+    print(coco_dt)
     coco_eval = COCOeval(coco_gt, coco_dt, "bbox")
     # coco_eval.params.iouThrs = [IOU_THRESHOLD]
     coco_eval.evaluate()
     coco_eval.accumulate()
+    print(coco_eval.stats)
     coco_eval.summarize()
 
 
@@ -110,5 +125,6 @@ if __name__ == "__main__":
 
 
     coco_gt = COCO("./instances_val2017.json")
-    results = asyncio.run(generate_detections(my_runtime, coco_gt, (640, 640)))
+    results = []
+    results = asyncio.run(generate_detections(my_runtime, coco_gt, (my_runtime.input_width, my_runtime.input_height)))
     evaluate_coco(coco_gt, results)

@@ -2,6 +2,7 @@ import cv2
 import torch
 import torchvision
 from ultralytics.utils import ops
+import time
 
 
 def load_dnxx_session(model_path="/home/orangepi/dx_app/example/YOLOV5S_3/graph.dxnn"):
@@ -88,12 +89,14 @@ class NPURuntime:
 
     def run_frame(self, frame):
         # preprocessing: fit image into square
-        image_input, _, _ = letter_box(
+        letter_box_out = letter_box(
             frame,
             new_shape=(self.input_width, self.input_height),
             fill_color=(114, 114, 114),
             format=cv2.COLOR_BGR2RGB,
         )
+        image_input, ratio, (dw, dh) = letter_box_out
+        print((dw,dh), frame.shape)
         # inference: (1) run dxrt inference engine,
         npu_output = self.ie.run(image_input)
         # inference: (2) run onnx session for decoding
@@ -107,6 +110,29 @@ class NPURuntime:
             input_names[2]: npu_output[2],
         }
         ort_output = self.sess.run(None, input_dict)
-        # TODO: move do_post to this class
         boxes = do_post(ort_output, self.conf_thres, self.iou_thres)
+        for box in boxes:
+            x,y,w,h = map(lambda _:int(_*512), box["xywh"])
+            # print(x,y,w,h)
+        #     cv2.rectangle(image_input,(x,y),(x+w,y+h),(255,255,255))
+        # cv2.imshow("image input", image_input)
+        # time.sleep(5)
+        frame_h,frame_w,_ = frame.shape
+
+        # FIX XY COORDS BACK WHEN PADDING WAS NORMAL
+        for box_i in range(len(boxes)):
+            x,y,w,h = map(lambda _:_*512,boxes[box_i]["xywh"])
+
+            # jeong-sang-hwa
+            x-=int(dw) 
+            y-=int(dh)
+            print(x,y,w,h, frame_w, frame_h)
+            # cv2.rectangle(frame,(x,y),(x+w,y+h),(255,0,0), 3)
+            boxes[box_i]["xywh"] = [
+                x/frame_w,
+                y/frame_h,
+                w/frame_w,
+                h/frame_h
+            ]
+        # cv2.imshow("frame",frame)
         return boxes
