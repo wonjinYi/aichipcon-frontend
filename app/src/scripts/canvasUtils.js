@@ -45,8 +45,10 @@ export function drawBoundingBoxes(canvasElement, _boxes) {
 
     const rectWidth = w * sourceW;
     const rectHeight = h * sourceH;
-    const rectX = x * sourceW - rectWidth / 2;
-    const rectY = y * sourceH - rectHeight / 2;
+    // const rectX = x * sourceW - rectWidth / 2;
+    // const rectY = y * sourceH - rectHeight / 2;
+    const rectX = x * sourceW;
+    const rectY = y * sourceH;
 
     // draw bounding box
     context.strokeStyle = boxColor;

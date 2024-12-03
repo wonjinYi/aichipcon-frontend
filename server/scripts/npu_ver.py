@@ -44,7 +44,7 @@ def letter_box(
     if format is not None:
         image_new = cv2.cvtColor(image_new, format)
 
-    return image_new, ratio, (dw, dh)
+    return image_new, ratio, (dw, dh), (top,bottom, left, right)
 
 
 def do_post(ort_output, conf_thres=0.3, iou_thres=0.4):
@@ -95,8 +95,8 @@ class NPURuntime:
             fill_color=(114, 114, 114),
             format=cv2.COLOR_BGR2RGB,
         )
-        image_input, ratio, (dw, dh) = letter_box_out
-        print((dw,dh), frame.shape)
+        image_input, ratio, (dw, dh), letter_box_tlbr = letter_box_out
+        # print((dw,dh), frame.shape)
         # inference: (1) run dxrt inference engine,
         npu_output = self.ie.run(image_input)
         # inference: (2) run onnx session for decoding
@@ -113,21 +113,19 @@ class NPURuntime:
         boxes = do_post(ort_output, self.conf_thres, self.iou_thres)
         for box in boxes:
             x,y,w,h = map(lambda _:int(_*512), box["xywh"])
-            # print(x,y,w,h)
-        #     cv2.rectangle(image_input,(x,y),(x+w,y+h),(255,255,255))
-        # cv2.imshow("image input", image_input)
-        # time.sleep(5)
         frame_h,frame_w,_ = frame.shape
 
         # FIX XY COORDS BACK WHEN PADDING WAS NORMAL
         for box_i in range(len(boxes)):
-            x,y,w,h = map(lambda _:_*512,boxes[box_i]["xywh"])
-
+            x,y,w,h = map(lambda _:int(_*512),boxes[box_i]["xywh"])
             # jeong-sang-hwa
             x-=int(dw) 
             y-=int(dh)
-            print(x,y,w,h, frame_w, frame_h)
-            # cv2.rectangle(frame,(x,y),(x+w,y+h),(255,0,0), 3)
+            x = max(0, min(frame_w, x/ratio[0]))
+            y = max(0, min(frame_h, y/ratio[1]))
+            w = max(0, min(frame_w, w/ratio[0]))
+            h = max(0, min(frame_h, h/ratio[1]))
+            # cv2.rectangle(frame,(int(x), int(y)),(int(x+w), int(y+h)),(255,0,0), 3)
             boxes[box_i]["xywh"] = [
                 x/frame_w,
                 y/frame_h,
@@ -135,4 +133,8 @@ class NPURuntime:
                 h/frame_h
             ]
         # cv2.imshow("frame",frame)
+        # cv2.imwrite(f"out.jpg",frame)
+        # print(frame.shape, boxes)
+        # time.sleep(20)
+        # exit()
         return boxes
